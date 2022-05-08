@@ -3,7 +3,7 @@ import numpy as np
 
 
 def makeCoordinates(image, linesParameters):
-    slope, intercept =linesParameters
+    slope, intercept = linesParameters
     y1 = image.shape[0]
     y2 = int(y1*(3/5))
     x1 = int((y1-intercept)/slope)
@@ -40,8 +40,7 @@ def canny(image):
 def displayLines(img, lin):
     lineImg = np.zeros_like(img)
     if lin is not None:
-        for line in lin:
-            x1, y1, x2, y2 = line.reshape(4)
+        for x1, y1, x2, y2 in lin:
             c.line(lineImg, (x1, y1), (x2, y2), (255, 200, 0), 10)
     return lineImg
 
@@ -57,6 +56,7 @@ def ROI(image):
     return maskedImg
 
 
+"""Image Algo
 image = c.imread('test_image.jpg')
 laneImage = np.copy(image)
 cany = canny(laneImage)
@@ -67,3 +67,20 @@ line_image = displayLines(laneImage, avgLines)
 combination = c.addWeighted(laneImage, 0.8, line_image, 1, 1)
 c.imshow("Result", combination)
 c.waitKey()
+"""
+
+
+cap = c.VideoCapture("test_video.mp4")
+while(cap.isOpened()):
+    _, frame = cap.read()
+    cany = canny(frame)
+    croppedImg = ROI(cany)
+    lines = c.HoughLinesP(croppedImg, 2, np.pi / 180, 100, np.array([]), minLineLength=40, maxLineGap=5)
+    avgLines = averagedSlopeIntercept(frame, lines)
+    line_image = displayLines(frame, avgLines)
+    combination = c.addWeighted(frame, 0.8, line_image, 1, 1)
+    c.imshow("Result", combination)
+    if c.waitKey(1) == ord('q'):
+        break
+cap.release()
+c.destroyAllWindows()
