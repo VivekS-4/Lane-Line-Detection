@@ -2,8 +2,8 @@ import cv2 as c
 import numpy as np
 
 
-def makeCoordinates(image, linesParameters):
-    slope, intercept = linesParameters
+def makeCoordinates(image, lines_parameters):
+    slope, intercept = lines_parameters
     y1 = image.shape[0]
     y2 = int(y1*(3/5))
     x1 = int((y1-intercept)/slope)
@@ -11,10 +11,10 @@ def makeCoordinates(image, linesParameters):
     return np.array([x1, y1, x2, y2])
 
 
-def averagedSlopeIntercept(image, lines):
+def averagedSlopeIntercept(image, line_s):
     left_fit = []
     right_fit = []
-    for line in lines:
+    for line in line_s:
         x1, y1, x2, y2 = line.reshape(4)
         parameters = np.polyfit((x1, x2), (y1, y2), 1)
         slope = parameters[0]
@@ -33,8 +33,8 @@ def averagedSlopeIntercept(image, lines):
 def canny(image):
     gray = c.cvtColor(image, c.COLOR_RGB2GRAY)
     blur = c.GaussianBlur(gray, (5, 5), 0)
-    canny = c.Canny(blur, 50, 150)
-    return canny
+    canny_img = c.Canny(blur, 50, 150)
+    return canny_img
 
 
 def displayLines(img, lin):
@@ -59,8 +59,8 @@ def ROI(image):
 """Image Algo
 image = c.imread('test_image.jpg')
 laneImage = np.copy(image)
-cany = canny(laneImage)
-croppedImg = ROI(cany)
+canny_image = canny(laneImage)
+croppedImg = ROI(canny_image)
 lines = c.HoughLinesP(croppedImg, 2, np.pi/180, 100, np.array([]), minLineLength=40, maxLineGap=5)
 avgLines = averagedSlopeIntercept(laneImage, lines)
 line_image = displayLines(laneImage, avgLines)
@@ -71,16 +71,16 @@ c.waitKey()
 
 
 cap = c.VideoCapture("test_video.mp4")
-while(cap.isOpened()):
+while cap.isOpened():
     _, frame = cap.read()
-    cany = canny(frame)
-    croppedImg = ROI(cany)
+    canny_image = canny(frame)
+    croppedImg = ROI(canny_image)
     lines = c.HoughLinesP(croppedImg, 2, np.pi / 180, 100, np.array([]), minLineLength=40, maxLineGap=5)
     avgLines = averagedSlopeIntercept(frame, lines)
     line_image = displayLines(frame, avgLines)
     combination = c.addWeighted(frame, 0.8, line_image, 1, 1)
     c.imshow("Result", combination)
-    if c.waitKey(1) == ord('q'):
+    if c.waitKey(1) & 0xFF == ord('q'):
         break
 cap.release()
 c.destroyAllWindows()
