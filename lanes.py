@@ -55,8 +55,8 @@ def ROI(image):
     maskedImg = c.bitwise_and(image, mask)
     return maskedImg
 
-
-"""Image Algo
+"""
+# Image Algo
 image = c.imread('test_image.jpg')
 laneImage = np.copy(image)
 canny_image = canny(laneImage)
@@ -69,7 +69,7 @@ c.imshow("Result", combination)
 c.waitKey()
 """
 
-
+# """
 cap = c.VideoCapture("test_video.mp4")
 while cap.isOpened():
     _, frame = cap.read()
@@ -84,3 +84,4 @@ while cap.isOpened():
         break
 cap.release()
 c.destroyAllWindows()
+# """)
